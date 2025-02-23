@@ -1,0 +1,1040 @@
+<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Frame.lua" />
+	<Frame name="vbotsButtonFrame" parent="Minimap" enableMouse="true" hidden="false" frameStrata="LOW">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="Minimap" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension x="2" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Button name="AtlasButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\vbots\img\vmButton"/>
+				<PushedTexture file="Interface\AddOns\vbots\img\vmButton-pushed"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForDrag("RightButton");
+						this.dragme = false;
+					</OnLoad>
+					<OnDragStart> 
+						this.dragme = true;
+					</OnDragStart> 
+					<OnDragStop>
+						this.dragme = false;
+					</OnDragStop>
+					<OnUpdate>
+						if(this.dragme == true) then
+							vbotsButtonFrame_BeingDragged();
+						end
+					</OnUpdate>
+					<OnClick>
+						vbotsButtonFrame_OnClick();
+					</OnClick>
+					<OnEnter>
+						vbotsButtonFrame_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("VARIABLES_LOADED");
+			</OnLoad>
+			<OnEvent>
+				vbotsButtonFrame_Init();
+				vbotsButtonFrame_UpdatePosition();
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="vbotsFrame" parent="UIParent" toplevel="true" movable="true" enableMouse="true">
+		<Size x="350" y="220" />
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+		<!-- Modern frame style -->
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" 
+				  edgeFile="Interface\DialogFrame\UI-DialogBox-Border" 
+				  tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+
+		<!-- Title bar -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTitleBG" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size x="350" y="64"/>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset x="0" y="12"/>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="VBots Control Panel">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset x="0" y="0"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="vbotsCredit" inherits="GameFontNormalSmall" text="vbots v2 beta">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativeTo="$parent">
+							<Offset>
+								<AbsDimension x="-20" y="10"/>  
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="0.7" g="0.7" b="0.7"/>  
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelButtonTemplate">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" inherits="GameFontNormal" text="X">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						CloseFrame();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<!-- Tab buttons with proper anchors -->
+			<Button name="$parentTab1" inherits="CharacterFrameTabButtonTemplate" id="1" text="Party">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent().selectedTab = 1;
+						PanelTemplates_UpdateTabs(this:GetParent());
+						vbotsFrame_ShowTab(1);
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Button name="$parentTab2" inherits="CharacterFrameTabButtonTemplate" id="2" text="Control">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent().selectedTab = 2;
+						PanelTemplates_UpdateTabs(this:GetParent());
+						vbotsFrame_ShowTab(2);
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentTab3" inherits="CharacterFrameTabButtonTemplate" id="3" text="BG">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent().selectedTab = 3;
+						PanelTemplates_UpdateTabs(this:GetParent());
+						vbotsFrame_ShowTab(3);
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentTab4" inherits="CharacterFrameTabButtonTemplate" id="4" text="Template">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentTab3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent().selectedTab = 4;
+						PanelTemplates_UpdateTabs(this:GetParent());
+						vbotsFrame_ShowTab(4);
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<!-- Content frames -->
+			<Frame name="$parentTab1Content">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-30"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<!-- Left Column -->
+					<Button name="PartyBotAddWarrior" inherits="UIPanelButtonTemplate" text="Add Warrior">
+						<Size x="90" y="20"/>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="20" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotAdd(self, "warrior");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotAddRogue" inherits="UIPanelButtonTemplate" text="Add Rogue">
+						<Size x="90" y="20"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotAddWarrior" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotAdd(self, "rogue");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotAddMage" inherits="UIPanelButtonTemplate" text="Add Mage">
+						<Size x="90" y="20"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotAddRogue" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotAdd(self, "mage");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotAddPriest" inherits="UIPanelButtonTemplate" text="Add Priest">
+						<Size x="90" y="20"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotAddMage" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotAdd(self, "priest");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					
+					<Button name="PartyBotDie" inherits="UIPanelButtonTemplate" text="Die">
+						<Size x="80" y="20"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="0" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".die", "WHISPER", nil, UnitName("player"));
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					
+					<Button name="PartyBotRevive" inherits="UIPanelButtonTemplate" text="Revive">
+						<Size x="80" y="20"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="0" y="-45"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".revive", "WHISPER", nil, UnitName("player"));								
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Right Column -->
+					<Button name="PartyBotAddHunter" inherits="UIPanelButtonTemplate" text="Add Hunter">
+						<Size x="90" y="20"/>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="-20" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotAdd(self, "hunter");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotAddWarlock" inherits="UIPanelButtonTemplate" text="Add Warlock">
+						<Size x="90" y="20"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotAddHunter" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotAdd(self, "warlock");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotAddDruid" inherits="UIPanelButtonTemplate" text="Add Druid">
+						<Size x="90" y="20"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotAddWarlock" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotAdd(self, "druid");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Faction-specific class button -->
+					<Button name="PartyBotAddFactionClass" inherits="UIPanelButtonTemplate">
+						<Size x="90" y="20"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotAddDruid" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								-- Don't try to set text here, it will be set by InitializeFactionClassButton
+								this:SetText("Loading...")
+							</OnLoad>
+							<OnClick>
+								if string.lower(UnitFactionGroup("player")) == "alliance" then
+									SubPartyBotAdd(this, "paladin");
+								else
+									SubPartyBotAdd(this, "shaman");
+								end
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Center Buttons -->
+					<Button name="PartyBotRemove" inherits="UIPanelButtonTemplate" text="Remove">
+						<Size x="80" y="20"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="0" y="-70"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotRemove(self);
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotClone" inherits="UIPanelButtonTemplate" text="Clone">
+						<Size x="80" y="20"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotRemove" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotClone(self);
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Role Buttons -->
+					<Button name="PartyBotSetTank" inherits="UIPanelButtonTemplate" text="Tank">
+						<Size x="70" y="20"/>
+						<Anchors>
+							<Anchor point="BOTTOM" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="-75" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotSetRole(self,"tank");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotSetDPS" inherits="UIPanelButtonTemplate" text="DPS">
+						<Size x="70" y="20"/>
+						<Anchors>
+							<Anchor point="BOTTOM" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="0" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotSetRole(self,"dps");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotSetHealer" inherits="UIPanelButtonTemplate" text="Heal">
+						<Size x="70" y="20"/>
+						<Anchors>
+							<Anchor point="BOTTOM" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="75" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotSetRole(this, "healer");
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="partybotsetrole" inherits="GameFontNormal" text="Assign role:">
+							<Anchors>
+								<Anchor point="BOTTOM" relativeTo="$parent">
+									<Offset>
+										<AbsDimension x="0" y="35"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Frame name="$parentTab2Content">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-30"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<!-- Update Tab2Content buttons -->
+					<!-- Left Column -->
+					<Button name="PartyBotAttackStart" inherits="UIPanelButtonTemplate" text="Start Combat">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="-52" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".partybot attackstart");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotPull" inherits="UIPanelButtonTemplate" text="Pull Target">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotAttackStart" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".partybot pull");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotCCMark" inherits="UIPanelButtonTemplate" text="CC Marks">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotPull" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".partybot ccmark");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotClearMarks" inherits="UIPanelButtonTemplate" text="Clear Marks">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotCCMark" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".partybot clearmarks");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotComeToMe" inherits="UIPanelButtonTemplate" text="Come to Me">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotClearMarks" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".partybot cometome");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Right Column -->
+					<Button name="PartyBotAttackStop" inherits="UIPanelButtonTemplate" text="Stop Combat">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="52" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".partybot attackstop");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotAOE" inherits="UIPanelButtonTemplate" text="AOE Mode">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotAttackStop" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".partybot aoe");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotFocusMark" inherits="UIPanelButtonTemplate" text="Focus Mark">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotAOE" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".partybot focusmark");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotPause" inherits="UIPanelButtonTemplate" text="Pause">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotFocusMark" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".partybot pause");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotUnpause" inherits="UIPanelButtonTemplate" text="Unpause">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotPause" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".partybot unpause");
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+
+			<Frame name="$parentTab3Content">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-30"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<!-- Start/Stop centered at top -->
+					<Button name="BattleBotStartBG" inherits="UIPanelButtonTemplate" text="Start BG">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="-52" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".bg start");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="BattleBotStopBG" inherits="UIPanelButtonTemplate" text="Stop BG">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="52" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".bg stop");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Left Column - Queue Buttons -->
+					<Button name="BattleGoWarsong" inherits="UIPanelButtonTemplate" text="Queue WSG">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="BattleBotStartBG" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubBattleGo(self, "warsong");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="BattleGoArathi" inherits="UIPanelButtonTemplate" text="Queue AB">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="BattleGoWarsong" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubBattleGo(self, "arathi");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="BattleGoAlterac" inherits="UIPanelButtonTemplate" text="Queue AV">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="BattleGoArathi" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubBattleGo(self, "alterac");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Right Column - Fill Buttons -->
+					<Button name="BattleFillWarsong" inherits="UIPanelButtonTemplate" text="Fill WSG">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="BattleBotStopBG" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubBattleFill(self, "warsong");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="BattleFillArathi" inherits="UIPanelButtonTemplate" text="Fill AB">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="BattleFillWarsong" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubBattleFill(self, "arathi");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="BattleFillAlterac" inherits="UIPanelButtonTemplate" text="Fill AV">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="BattleFillArathi" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubBattleFill(self, "alterac");
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+
+			<Frame name="$parentTab4Content">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-30"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<!-- Template selection dropdown -->
+					<Frame name="vbotsTemplateDropDown" inherits="UIDropDownMenuTemplate">
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								UIDropDownMenu_SetWidth(150);
+								UIDropDownMenu_Initialize(this, TemplateDropDown_Initialize);
+								getglobal(this:GetName().."Text"):SetText("Select Template");
+							</OnLoad>
+						</Scripts>
+					</Frame>
+
+					<!-- Gear/Spec Template buttons -->
+					<Button name="vbotsGearButton" inherits="UIPanelButtonTemplate" text="Gear Template">
+						<Size x="110" y="25"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="vbotsTemplateDropDown" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="-60" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".character premade gear");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="vbotsSpecButton" inherits="UIPanelButtonTemplate" text="Spec Template">
+						<Size x="110" y="25"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="vbotsTemplateDropDown" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="60" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SendChatMessage(".character premade spec");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Save buttons -->
+					<Button name="vbotsSaveGearButton" inherits="UIPanelButtonTemplate" text="Save Gear">
+						<Size x="110" y="25"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="vbotsGearButton" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								local name = getglobal("vbotsTemplateNameEdit"):GetText();
+								if name and name ~= "Enter template name" then
+									SendChatMessage(".character premade savegear " .. name);
+								else
+									DEFAULT_CHAT_FRAME:AddMessage("Please enter a template name first!");
+								end
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="vbotsSaveSpecButton" inherits="UIPanelButtonTemplate" text="Save Spec">
+						<Size x="110" y="25"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="vbotsSpecButton" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								local name = getglobal("vbotsTemplateNameEdit"):GetText();
+								if name and name ~= "Enter template name" then
+									SendChatMessage(".character premade savespec " .. name);
+								else
+									DEFAULT_CHAT_FRAME:AddMessage("Please enter a template name first!");
+								end
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- EditBox -->
+					<EditBox name="vbotsTemplateNameEdit" letters="32" historyLines="0" autoFocus="false">
+						<Size>
+							<AbsDimension x="200" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="vbotsSaveGearButton" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="60" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+									<Size><AbsDimension x="8" y="20"/></Size>
+									<Anchors><Anchor point="TOPLEFT"/></Anchors>
+									<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+									<Size><AbsDimension x="8" y="20"/></Size>
+									<Anchors><Anchor point="TOPRIGHT"/></Anchors>
+									<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+									<Size><AbsDimension x="10" y="20"/></Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+										<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+									</Anchors>
+									<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this:SetText("Enter template name");
+								this:SetTextColor(0.5, 0.5, 0.5);
+							</OnLoad>
+							<OnEditFocusGained>
+								if this:GetText() == "Enter template name" then
+									this:SetText("");
+									this:SetTextColor(1, 1, 1);
+								end
+							</OnEditFocusGained>
+							<OnEditFocusLost>
+								if this:GetText() == "" then
+									this:SetText("Enter template name");
+									this:SetTextColor(0.5, 0.5, 0.5);
+								end
+							</OnEditFocusLost>
+						</Scripts>
+						<FontString inherits="ChatFontNormal"/>
+					</EditBox>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this.selectedTab = 1;
+				PanelTemplates_SetNumTabs(this, 4);
+				PanelTemplates_SetTab(this, 1);
+				vbotsFrame_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				if event == "VARIABLES_LOADED" then
+					vbotsButtonFrame_Init();
+					vbotsButtonFrame_UpdatePosition();
+				end
+			</OnEvent>
+			<OnMouseDown>
+				if (arg1 == "LeftButton") then
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if (arg1 == "LeftButton") then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+	<Button name="AttributeOptions" inherits="GameMenuButtonTemplate" parent="GameMenuFrame" text="VBOTS">
+		<Anchors>
+			<Anchor point="CENTER" relativePoint="BOTTOM">
+				<Offset>
+					<AbsDimension x="0" y="10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnClick>
+				OpenFrame();
+			</OnClick>
+		</Scripts>
+	</Button>
+</Ui>
