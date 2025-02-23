@@ -1,6 +1,6 @@
-![License](https://img.shields.io/github/license/HerrTaeubler/vmangos-pbotaddon)
-![Language](https://img.shields.io/github/languages/top/HerrTaeubler/vmangos-pbotaddon)
-![Last Commit](https://img.shields.io/github/last-commit/HerrTaeubler/vmangos-pbotaddon)
+![License](https://img.shields.io/github/license/HerrTaeubler/VBots-v2-playerbotaddon)
+![Language](https://img.shields.io/github/languages/top/HerrTaeubler/VBots-v2-playerbotaddon)
+![Last Commit](https://img.shields.io/github/last-commit/HerrTaeubler/VBots-v2-playerbotaddon)
 
 # VBots v2 playerbotaddon
 
@@ -27,7 +27,7 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 ### Core Improvements
 - Complete rewrite of the core system
  
-![UI]([https://github.com/HerrTaeubler/vmangos-pbotaddon](https://github.com/HerrTaeubler/VBots-v2-playerbotaddon/blob/main/botui.jpg)
+![UI]([https://github.com/HerrTaeubler/VBots-v2-playerbotaddon](https://github.com/HerrTaeubler/VBots-v2-playerbotaddon/blob/main/botui.jpg)
 
 ### UI System
 -  A new 'modern' take on the classic frame style, featuring well-defined borders that seamlessly integrate with the beloved legacy WoW UI.
