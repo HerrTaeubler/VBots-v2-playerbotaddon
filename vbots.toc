@@ -1,10 +1,9 @@
 ## Interface: 11200
-## Title: vbot
-## Notes: vmangos bot panel, open gui from Main Menu
-## Notes-zhCN: vmangos bot panel, open gui from Main Menu
-## Author: coolzoom
+## Title: VBots v2
+## Notes: VMaNGOS bot control panel with BG fill system and template management
+## Author: HerrTaeubler
 ## DefaultState: Enabled
-## Version: 1.0.0
+## Version: 2.0.0-beta
 
 vbots.lua
 vbots.xml
