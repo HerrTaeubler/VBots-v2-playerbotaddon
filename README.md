@@ -27,7 +27,7 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 ### Core Improvements
 - Complete rewrite of the core system
  
-![UI]([https://github.com/HerrTaeubler/VBots-v2-playerbotaddon](https://github.com/HerrTaeubler/VBots-v2-playerbotaddon/blob/main/botui.jpg)
+![UI](https://raw.githubusercontent.com/HerrTaeubler/VBots-v2-playerbotaddon/main/botui.jpg)
 
 ### UI System
 -  A new 'modern' take on the classic frame style, featuring well-defined borders that seamlessly integrate with the beloved legacy WoW UI.
