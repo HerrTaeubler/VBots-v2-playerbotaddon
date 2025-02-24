@@ -58,7 +58,7 @@ local MinimapButton = {
 local playerFaction = nil  -- Initialize as nil
 
 -- Get faction
-local function GetPlayerFaction()
+function GetPlayerFaction()
     if not playerFaction then
         local faction = UnitFactionGroup("player")
         if faction then
