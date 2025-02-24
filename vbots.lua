@@ -57,15 +57,29 @@ local MinimapButton = {
 
 local playerFaction = nil  -- Initialize as nil
 
--- Add this function to safely get faction
+-- Get faction
 local function GetPlayerFaction()
     if not playerFaction then
         local faction = UnitFactionGroup("player")
         if faction then
             playerFaction = string.lower(faction)
+        else
+            -- Try to determine faction from race for GM characters
+            local _, race = UnitRace("player")
+            if race then
+                if race == "Human" or race == "Dwarf" or race == "NightElf" or race == "Gnome" then
+                    playerFaction = "alliance"
+                elseif race == "Orc" or race == "Troll" or race == "Tauren" or race == "Undead" then
+                    playerFaction = "horde"
+                else
+                    playerFaction = "alliance" -- Default fallback
+                end
+            else
+                playerFaction = "alliance" -- Default fallback if even race is unavailable
+            end
         end
     end
-    return playerFaction or "alliance"  -- Default to alliance if faction not yet available
+    return playerFaction
 end
 
 -- Minimap button position calculation optimization
@@ -334,7 +348,7 @@ end)
 
 -- Function to fill a battleground -- THANK YOU DIGITAL SCRIPTORIUM FOR THE IDEA - https://www.youtube.com/@Digital-Scriptorium
 function SubBattleFill(self, bgType)
-    local playerFaction = string.lower(UnitFactionGroup("player"))
+    local playerFaction = GetPlayerFaction() 
     local playerLevel = UnitLevel("player")
     local bgData = BG_INFO[bgType]
     
