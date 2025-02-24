@@ -232,17 +232,15 @@ end
 local templates = {}
 
 -- Faction button handling
-local function InitializeFactionClassButton()
+function InitializeFactionClassButton()
     local button = getglobal("PartyBotAddFactionClass")
     if button then
-        local faction = string.lower(UnitFactionGroup("player"))
+        local faction = GetPlayerFaction()  -- Use our safer function instead of direct UnitFactionGroup call
         if faction == "alliance" then
             button:SetText("Add Paladin")
         else
             button:SetText("Add Shaman")
         end
-    else
-        
     end
 end
 
@@ -274,11 +272,8 @@ f:SetScript("OnEvent", function()
     end
 
     if event == "PLAYER_ENTERING_WORLD" then
-        local faction = UnitFactionGroup("player")
-        if faction then
-            playerFaction = string.lower(faction)
-            InitializeFactionClassButton()
-        end
+        local faction = GetPlayerFaction()  -- Use our safer function here
+        InitializeFactionClassButton()    
     end
 end)
 
