@@ -401,7 +401,8 @@
 								this:SetText("Loading...")
 							</OnLoad>
 							<OnClick>
-								if string.lower(UnitFactionGroup("player")) == "alliance" then
+								local faction = GetPlayerFaction()  
+								if faction == "alliance" then
 									SubPartyBotAdd(this, "paladin");
 								else
 									SubPartyBotAdd(this, "shaman");
