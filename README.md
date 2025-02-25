@@ -2,7 +2,7 @@
 ![Language](https://img.shields.io/github/languages/top/HerrTaeubler/VBots-v2-playerbotaddon)
 ![Last Commit](https://img.shields.io/github/last-commit/HerrTaeubler/VBots-v2-playerbotaddon)
 
-# VBots v2 playerbotaddon
+# VBots v2.1 playerbotaddon
 
 A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user interface and enhanced functionality.
 
@@ -22,9 +22,21 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 3. Rename the folder to `vbots`
 4. Restart World of Warcraft if it's running
 
-## New in v2 Beta
+## New in v2.1 Beta
 
 ![UI](https://raw.githubusercontent.com/HerrTaeubler/VBots-v2-playerbotaddon/main/botui.jpg)
+
+### Temporary Bot Support
+- Added support for temporary bots in battlegrounds
+- New checkbox in the BG tab to toggle between permanent and temporary bots
+- Temporary bots are automatically removed when they leave the battleground
+- Uses the new server command: `.battlebot add [bg] [faction] [level] temp`
+
+### GM Mode Improvements
+- Added manual faction override for GM mode
+- Use `/vbots faction alliance` or `/vbots faction horde` to set your faction manually
+- Improved faction detection for GM characters
+- Fixed issues with faction-specific class buttons and battleground fills in GM mode
 
 ### Core Improvements
 - Complete rewrite of the core system
