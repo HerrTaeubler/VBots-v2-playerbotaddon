@@ -36,6 +36,9 @@ local BG_INFO = {
     }
 }
 
+-- Track if temporary bots should be used
+local useTempBots = false
+
 -- Command queue system
 local CommandQueue = {
     commands = {},
@@ -56,30 +59,67 @@ local MinimapButton = {
 
 
 local playerFaction = nil  -- Initialize as nil
+local manualFactionOverride = nil -- For manual override
 
--- Get faction
+-- Get faction with improved detection for GM mode
 function GetPlayerFaction()
+    -- If manual override is set, use that
+    if manualFactionOverride then
+        return manualFactionOverride
+    end
+    
+    -- Try to determine faction from race first (more reliable in GM mode)
+    local _, race = UnitRace("player")
+    if race then
+        if race == "Human" or race == "Dwarf" or race == "NightElf" or race == "Gnome" then
+            return "alliance"
+        elseif race == "Orc" or race == "Troll" or race == "Tauren" or race == "Undead" or race == "Scourge" then
+            return "horde"
+        end
+    end
+    
+    -- If race detection failed, try faction group
     if not playerFaction then
         local faction = UnitFactionGroup("player")
         if faction then
             playerFaction = string.lower(faction)
         else
-            -- Try to determine faction from race for GM characters
-            local _, race = UnitRace("player")
-            if race then
-                if race == "Human" or race == "Dwarf" or race == "NightElf" or race == "Gnome" then
-                    playerFaction = "alliance"
-                elseif race == "Orc" or race == "Troll" or race == "Tauren" or race == "Undead" then
-                    playerFaction = "horde"
-                else
-                    playerFaction = "alliance" -- Default fallback
-                end
-            else
-                playerFaction = "alliance" -- Default fallback if even race is unavailable
-            end
+            -- Default fallback if all detection methods fail
+            DEFAULT_CHAT_FRAME:AddMessage("Faction detection failed. Using Alliance as default. Use /vbots faction alliance|horde to set manually.")
+            playerFaction = "alliance"
         end
     end
+    
     return playerFaction
+end
+
+-- Function to manually set faction
+function SetPlayerFaction(faction)
+    if faction == "alliance" or faction == "horde" then
+        manualFactionOverride = faction
+        DEFAULT_CHAT_FRAME:AddMessage("Faction manually set to: " .. faction)
+        -- Update UI elements that depend on faction
+        InitializeFactionClassButton()
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("Invalid faction. Use 'alliance' or 'horde'.")
+    end
+end
+
+-- Slash command to set faction manually
+SLASH_VBOTS1 = "/vbots"
+SlashCmdList["VBOTS"] = function(msg)
+    local command, arg = string.match(msg, "^(%S+)%s*(.*)$")
+    
+    if command == "faction" then
+        if arg == "alliance" or arg == "horde" then
+            SetPlayerFaction(arg)
+        else
+            DEFAULT_CHAT_FRAME:AddMessage("Usage: /vbots faction alliance|horde")
+        end
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("VBots commands:")
+        DEFAULT_CHAT_FRAME:AddMessage("/vbots faction alliance|horde - Manually set your faction")
+    end
 end
 
 -- Minimap button position calculation optimization
@@ -235,12 +275,13 @@ local templates = {}
 function InitializeFactionClassButton()
     local button = getglobal("PartyBotAddFactionClass")
     if button then
-        local faction = GetPlayerFaction()  -- Use our safer function instead of direct UnitFactionGroup call
+        local faction = GetPlayerFaction()
         if faction == "alliance" then
             button:SetText("Add Paladin")
         else
             button:SetText("Add Shaman")
         end
+        DEFAULT_CHAT_FRAME:AddMessage("Faction detected as: " .. faction)
     end
 end
 
@@ -271,9 +312,11 @@ f:SetScript("OnEvent", function()
         end
     end
 
-    if event == "PLAYER_ENTERING_WORLD" then
-        local faction = GetPlayerFaction()  -- Use our safer function here
-        InitializeFactionClassButton()    
+    if event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_LOGIN" then
+        -- Initialize faction detection
+        local faction = GetPlayerFaction()
+        DEFAULT_CHAT_FRAME:AddMessage("VBots: Detected faction as " .. faction)
+        InitializeFactionClassButton()
     end
 end)
 
@@ -362,13 +405,19 @@ function SubBattleFill(self, bgType)
     CommandQueue.commands = {}
     CommandQueue.timer = 0
     
+    DEFAULT_CHAT_FRAME:AddMessage("Using faction: " .. playerFaction .. " for BG fill")
+    
     -- Add Alliance bots
     local allianceCount = bgData.size
     if playerFaction == "alliance" then
         allianceCount = bgData.size - 1 -- Leave one spot for the player
     end
     for i = 1, allianceCount do
-        QueueCommand(CMD_BATTLEBOT_ADD .. bgType .. " alliance " .. playerLevel)
+        local command = CMD_BATTLEBOT_ADD .. bgType .. " alliance " .. playerLevel
+        if useTempBots then
+            command = command .. " temp"
+        end
+        QueueCommand(command)
     end
     
     -- Add Horde bots
@@ -377,7 +426,11 @@ function SubBattleFill(self, bgType)
         hordeCount = bgData.size - 1 -- Leave one spot for the player
     end
     for i = 1, hordeCount do
-        QueueCommand(CMD_BATTLEBOT_ADD .. bgType .. " horde " .. playerLevel)
+        local command = CMD_BATTLEBOT_ADD .. bgType .. " horde " .. playerLevel
+        if useTempBots then
+            command = command .. " temp"
+        end
+        QueueCommand(command)
     end
     
     -- Queue the battleground at the end
@@ -385,5 +438,19 @@ function SubBattleFill(self, bgType)
     
     -- Show feedback message
     local totalBots = allianceCount + hordeCount
-    DEFAULT_CHAT_FRAME:AddMessage("Queueing " .. totalBots .. " level " .. playerLevel .. " bots for " .. bgType .. " (leaving space for you in " .. playerFaction .. " team)")
+    local botType = useTempBots and "temporary" or "permanent"
+    DEFAULT_CHAT_FRAME:AddMessage("Queueing " .. totalBots .. " level " .. playerLevel .. " " .. botType .. " bots for " .. bgType .. " (leaving space for you in " .. playerFaction .. " team)")
+end 
+
+-- Function to toggle temporary bots
+function ToggleTempBots()
+    useTempBots = not useTempBots
+    local status = useTempBots and "enabled" or "disabled"
+    DEFAULT_CHAT_FRAME:AddMessage("Temporary bots " .. status)
+    
+    -- Update checkbox visual state
+    local checkbox = getglobal("TempBotsCheckbox")
+    if checkbox then
+        checkbox:SetChecked(useTempBots)
+    end
 end 

@@ -831,6 +831,35 @@
 							</OnClick>
 						</Scripts>
 					</Button>
+
+					<!-- Temporary Bots Checkbox -->
+					<CheckButton name="TempBotsCheckbox" inherits="UICheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="BattleFillAlterac" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="-40" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentText" inherits="GameFontNormal" text="Use Temporary Bots">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="5" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								ToggleTempBots();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
 				</Frames>
 			</Frame>
 

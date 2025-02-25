@@ -2,7 +2,7 @@
 ![Language](https://img.shields.io/github/languages/top/HerrTaeubler/VBots-v2-playerbotaddon)
 ![Last Commit](https://img.shields.io/github/last-commit/HerrTaeubler/VBots-v2-playerbotaddon)
 
-# VBots v2.1 playerbotaddon
+# VBots v2 playerbotaddon
 
 A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user interface and enhanced functionality.
 
