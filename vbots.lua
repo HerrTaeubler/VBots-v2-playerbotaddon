@@ -1,6 +1,5 @@
 -- Create Date : 2020/5/12 10:00:00 by coolzoom https://github.com/coolzoom/vmangos-pbotaddon/tree/master
--- Update Date : 2025/2/22 18:00:00 by HerrTaeubler 
--- Remater Date : 2025/2/23 15:31:24 by HerrTaeubler https://github.com/HerrTaeubler/vmangos-pbotaddon
+-- Remaster Date : 2025/2/23 15:31:24 by HerrTaeubler https://github.com/HerrTaeubler/vmangos-pbotaddon
 -- Constants moved to top and grouped logically
 local ADDON_NAME = "VBots"
 
