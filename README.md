@@ -32,7 +32,6 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 - Temporary bots are automatically removed when they leave the battleground
 - Uses the new server command: `.battlebot add [bg] [faction] [level] temp`
 
-Note: If you want the temporary bots, you will need to compile VMangos from my repository until my PR gets merged.
 
 ### GM Mode Improvements
 - Added manual faction override for GM mode
