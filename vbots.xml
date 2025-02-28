@@ -907,7 +907,7 @@
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								SendChatMessage(".character premade gear");
+								GearTemplateButtonClick();
 							</OnClick>
 						</Scripts>
 					</Button>
@@ -923,7 +923,7 @@
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								SendChatMessage(".character premade spec");
+								SpecTemplateButtonClick();
 							</OnClick>
 						</Scripts>
 					</Button>

@@ -3,6 +3,12 @@
 -- Constants moved to top and grouped logically
 local ADDON_NAME = "VBots"
 
+
+local isLookingForTemplates = false
+
+local templateScanTimer = 0
+local TEMPLATE_SCAN_TIMEOUT = 5 -- seconds to wait before turning off template scanning
+
 -- Command constants
 -- PartyBot commands
 CMD_PARTYBOT_CLONE = ".partybot clone"
@@ -294,20 +300,22 @@ f:SetScript("OnEvent", function()
     local event = event
     local message = arg1
 
-    if event == "CHAT_MSG_SYSTEM" and message then
-        if string.find(message, "^%d+%s*-%s*") then
-            local _, _, id, name = string.find(message, "^(%d+)%s*-%s*([^%(]+)")
-            if id and name then
-                templates[id] = name
-                local dropdown = getglobal("vbotsTemplateDropDown")
-                if dropdown then
-                    UIDropDownMenu_Initialize(dropdown, TemplateDropDown_Initialize)
+    if event == "CHAT_MSG_SYSTEM" and message then    
+        if isLookingForTemplates then
+            if string.find(message, "^%d+%s*-%s*") then
+                local _, _, id, name = string.find(message, "^(%d+)%s*-%s*([^%(]+)")
+                if id and name then
+                    templates[id] = name
+                    local dropdown = getglobal("vbotsTemplateDropDown")
+                    if dropdown then
+                        UIDropDownMenu_Initialize(dropdown, TemplateDropDown_Initialize)
+                    end
                 end
             end
-        end
-        
-        if string.find(message, "Listing available premade templates") then
-            templates = {}
+            
+            if string.find(message, "Listing available premade templates") then
+                templates = {}
+            end
         end
     end
 
@@ -453,3 +461,42 @@ function ToggleTempBots()
         checkbox:SetChecked(useTempBots)
     end
 end 
+
+-- Add a frame to handle the template scan timeout
+local templateScanFrame = CreateFrame("Frame")
+templateScanFrame:Hide()
+templateScanFrame:SetScript("OnUpdate", function()
+    if not isLookingForTemplates then
+        templateScanFrame:Hide()
+        return
+    end
+    
+    templateScanTimer = templateScanTimer + arg1
+    if templateScanTimer >= TEMPLATE_SCAN_TIMEOUT then
+        isLookingForTemplates = false
+        templateScanTimer = 0
+        templateScanFrame:Hide()
+        DEFAULT_CHAT_FRAME:AddMessage("Template scanning completed.")
+    end
+end)
+
+-- Function to start template scanning
+function StartTemplateScan()
+    isLookingForTemplates = true
+    templateScanTimer = 0
+    templateScanFrame:Show()
+    DEFAULT_CHAT_FRAME:AddMessage("Looking for templates...")
+end
+
+-- Functions for template buttons
+function GearTemplateButtonClick()
+    templates = {} -- Clear existing templates
+    StartTemplateScan()
+    SendChatMessage(CMD_PARTYBOT_GEAR)
+end
+
+function SpecTemplateButtonClick()
+    templates = {} -- Clear existing templates
+    StartTemplateScan()
+    SendChatMessage(CMD_PARTYBOT_SPEC)
+end
