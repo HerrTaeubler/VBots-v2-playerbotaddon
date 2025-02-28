@@ -4,6 +4,7 @@
 ## Author: HerrTaeubler
 ## DefaultState: Enabled
 ## Version: 2.1.1-beta
+## SavedVariables: VBotsDB
 
 vbots.lua
 vbots.xml

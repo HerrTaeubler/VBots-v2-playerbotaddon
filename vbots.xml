@@ -1053,18 +1053,4 @@
 			</OnMouseUp>
 		</Scripts>
 	</Frame>
-	<Button name="AttributeOptions" inherits="GameMenuButtonTemplate" parent="GameMenuFrame" text="VBOTS">
-		<Anchors>
-			<Anchor point="CENTER" relativePoint="BOTTOM">
-				<Offset>
-					<AbsDimension x="0" y="10"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-		<Scripts>
-			<OnClick>
-				OpenFrame();
-			</OnClick>
-		</Scripts>
-	</Button>
 </Ui>

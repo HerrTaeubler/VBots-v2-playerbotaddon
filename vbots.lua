@@ -3,6 +3,10 @@
 -- Constants moved to top and grouped logically
 local ADDON_NAME = "VBots"
 
+-- Initialize saved variables if not exists
+VBotsDB = VBotsDB or {
+    minimapButtonPosition = 268 -- Default position
+}
 
 local isLookingForTemplates = false
 
@@ -54,7 +58,7 @@ local CommandQueue = {
 -- Local variables for minimap button
 local MinimapButton = {
     shown = true,
-    position = 268,
+    position = VBotsDB.minimapButtonPosition or 268,
     radius = 78,
     cos = math.cos,
     sin = math.sin,
@@ -151,10 +155,14 @@ function MinimapButton:CalculatePosition(xpos, ypos)
     end
     
     self.position = angle
+    VBotsDB.minimapButtonPosition = angle -- Save position to saved variables
     self:UpdatePosition()
 end
 
 function MinimapButton:Init()
+    -- Load saved position if available
+    self.position = VBotsDB.minimapButtonPosition or self.position
+    
     if self.shown then
         vbotsFrame:Show()
     else
