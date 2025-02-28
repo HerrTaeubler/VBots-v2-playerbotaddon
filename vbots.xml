@@ -556,7 +556,7 @@
 						</Scripts>
 					</Button>
 
-					<Button name="PartyBotCCMark" inherits="UIPanelButtonTemplate" text="CC Marks">
+					<Button name="PartyBotCCMark" inherits="UIPanelButtonTemplate" text="CC Star">
 						<Size x="100" y="22"/>
 						<Anchors>
 							<Anchor point="TOP" relativeTo="PartyBotPull" relativePoint="BOTTOM">
@@ -567,7 +567,7 @@
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								SendChatMessage(".partybot ccmark");
+								SendChatMessage(".partybot ccmark star");
 							</OnClick>
 						</Scripts>
 					</Button>
@@ -637,7 +637,7 @@
 						</Scripts>
 					</Button>
 
-					<Button name="PartyBotFocusMark" inherits="UIPanelButtonTemplate" text="Focus Mark">
+					<Button name="PartyBotFocusMark" inherits="UIPanelButtonTemplate" text="Focus Skull">
 						<Size x="100" y="22"/>
 						<Anchors>
 							<Anchor point="TOP" relativeTo="PartyBotAOE" relativePoint="BOTTOM">
@@ -648,7 +648,7 @@
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								SendChatMessage(".partybot focusmark");
+								SendChatMessage(".partybot focusmark skull");
 							</OnClick>
 						</Scripts>
 					</Button>
